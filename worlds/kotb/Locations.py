@@ -225,6 +225,14 @@ location_data_table: Dict[str, KOTBLocationData] = {
         address=8675349,
         is_rule=True,
     ),
+    "Achievement : DROP_MENULOGO": KOTBLocationData(
+        region="Act 2",
+        address=8675350,
+    ),
+    "Achievement : HIDE_BEHIND_TROLL": KOTBLocationData(
+        region="Act 2",
+        address=8675351,
+    ),
     "Bad ending": KOTBLocationData(
         region="Act 2",
         locked_item="Victory"

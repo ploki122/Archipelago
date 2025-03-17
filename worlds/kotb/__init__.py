@@ -6,6 +6,7 @@ from .Items import KOTBItem, item_data_table, item_table
 from .Locations import KOTBLocation, location_data_table, location_table, locked_locations
 from .Options import KOTBOptions
 from .Regions import region_data_table
+from .Rules import set_victory_rule, set_location_rules
 
 
 class KOTBWebWorld(WebWorld):
@@ -45,9 +46,6 @@ class KOTBWorld(World):
             if item.code and item.can_create(self):
                 item_pool.append(self.create_item(name))
 
-        for i in range(23):
-            item_pool.append(self.create_item(self.get_filler_item_name()))
-
         self.multiworld.itempool += item_pool
 
     def create_regions(self) -> None:
@@ -78,8 +76,11 @@ class KOTBWorld(World):
         return "Rule 00"
 
     def set_rules(self) -> None:
+        # Location rules
+        Rules.set_location_rules(self, self.player)
+
         # Completion condition.
-        self.multiworld.completion_condition[self.player] = lambda state: state.has("Rule 00", self.player)
+        Rules.set_victory_rule(self, self.player)
 
     def fill_slot_data(self) -> Dict[str, Any]:
         return {

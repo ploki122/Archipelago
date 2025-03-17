@@ -6,6 +6,6 @@ class KOTBRegionData(NamedTuple):
 
 
 region_data_table: Dict[str, KOTBRegionData] = {
-    "Menu": KOTBRegionData(["Act 1"]),
-    "Act 1": KOTBRegionData(),
+    "Menu": KOTBRegionData(["Act 2"]),
+    "Act 2": KOTBRegionData(),
 }

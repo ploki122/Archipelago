@@ -1,7 +1,7 @@
-from typing import Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from enum import StrEnum
 from BaseClasses import CollectionState
-from ..generic.Rules import CollectionRule
+from ..generic.Rules import set_rule
 
 if TYPE_CHECKING:
     from . import KOTBWorld
@@ -42,40 +42,11 @@ class Rules(StrEnum):
 
 class KOTBRules:
     player: int
-    world: "KOTBWorld"
-    capture_rules: dict[str, CollectionRule]
-    rule_break_rules: dict[str, CollectionRule]
-    goal_rules: dict[str, CollectionRule]
-    # def get_capture_rule(world: "KOTBWorld", piece: str) -> Callable[[CollectionState], bool]:
-    #     if piece == "pawn":
-    #         return lambda state: (state.has_any([Rules.MOVE_PAWN, Rules.MOVE_KNIGHT], world.player) or
-    #                               can_move_bishop_fully(world) or
-    #                               can_move_rook_fully(world) or
-    #                               can_kill_enemies_on_mines(world))
-    #
-    #     if piece == "bishop":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world)
-    #
-    #     if piece == "knight":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world) or can_move_rook_fully(world)
-    #
-    #     if piece == "rook":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world) or can_move_rook_fully(world)
-    #
-    #     if piece == "queen":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world) or can_move_rook_fully(world)
-    #
-    #     if piece == "king":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world) or can_move_rook_fully(world)
-    #
-    #     if piece == "castle":
-    #         return can_move_bishop_fully(world) or can_kill_enemies_on_mines(world) or can_move_rook_fully(world)
-    #
-    #     if piece == "landmine":
-    #     return lambda state: state.has_all([Rules.MOVE_BISHOP, Rules.MOVE_PAWN, Rules.GAME_BISHOP_GIFT], world.player)
-    #
-    #     return lambda state: True
 
+    def __init__(self, player: int):
+        self.player = player
+
+    # region Sub-rules
     def can_move_bishop(self, state: CollectionState) -> bool:
         return state.has(Rules.MOVE_BISHOP, self.player)
 
@@ -154,3 +125,67 @@ class KOTBRules:
 
     def can_capture_landmine(self, state: CollectionState) -> bool:
         return self.can_capture_pieces(state) or self.can_lay_mines(state)
+    # endregion
+
+
+def set_location_rules(world: "KOTBWorld", player: int) -> None:
+    rules: KOTBRules = KOTBRules(player)
+
+    # Captures
+    set_rule(world.get_location("Capture Pawn"),
+             lambda state: rules.can_capture_pawn(state))
+    set_rule(world.get_location("Capture Bishop"),
+             lambda state: rules.can_capture_bishop(state))
+    set_rule(world.get_location("Capture Rook"),
+             lambda state: rules.can_capture_rook(state))
+    set_rule(world.get_location("Capture King"),
+             lambda state: rules.can_capture_king(state))
+    set_rule(world.get_location("Capture Queen"),
+             lambda state: rules.can_capture_queen(state))
+    set_rule(world.get_location("Capture Knight"),
+             lambda state: rules.can_capture_knight(state))
+    set_rule(world.get_location("Capture Castle"),
+             lambda state: rules.can_capture_castle(state))
+    set_rule(world.get_location("Capture Landmine"),
+             lambda state: rules.can_capture_landmine(state))
+
+    # Rule breaks
+    set_rule(world.get_location("Break rule 00"),
+             lambda state: rules.can_accuse_of_cheating(state))
+    set_rule(world.get_location("Break rule 02"),
+             lambda state: state.has("Rule 02", player))
+    set_rule(world.get_location("Break rule 04"),
+             lambda state: rules.can_move_pawn(state))
+    set_rule(world.get_location("Break rule 06"),
+             lambda state: rules.can_move_pawn_fully(state))
+    set_rule(world.get_location("Break rule 07"),
+             lambda state: rules.can_move_knight_fully(state) or
+             (rules.can_move_knight(state) and rules.can_move_pawn(state)))
+    set_rule(world.get_location("Break rule 09"),
+             lambda state: state.has("Rule 09", player) and (rules.can_move_bishop(state) or rules.can_move_queen(state)
+                                                             or rules.can_move_rook(state)))
+    set_rule(world.get_location("Break rule 12"),
+             lambda state: rules.can_move_king(state))
+    set_rule(world.get_location("Break rule 13"),
+             lambda state: rules.can_move_bishop(state))
+    set_rule(world.get_location("Break rule 14"),
+             lambda state: rules.can_move_rook(state))
+    set_rule(world.get_location("Break rule 18"),
+             lambda state: rules.can_move_queen(state))
+    set_rule(world.get_location("Break rule 24"),
+             lambda state: rules.can_capture_pawn(state))
+    set_rule(world.get_location("Break rule 25"),
+             lambda state: rules.can_move_knight(state) or rules.can_move_queen(state) or rules.can_move_rook(state)
+             or rules.can_move_pawn(state) or rules.can_move_king(state))
+    set_rule(world.get_location("Break rule 26"),
+             lambda state: rules.can_lay_mines(state))
+    set_rule(world.get_location("Break rule 28"),
+             lambda state: rules.can_castle(state))
+    set_rule(world.get_location("Break rule 29"),
+             lambda state: rules.can_move_queen(state) and rules.can_capture_king(state))
+
+
+def set_victory_rule(world: "KOTBWorld", player: int) -> None:
+    rules: KOTBRules = KOTBRules(player)
+
+    world.multiworld.completion_condition[player] = lambda state: rules.can_capture_everything(state)

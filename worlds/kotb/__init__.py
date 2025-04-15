@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 from .Items import KOTBItem, item_data_table, item_table
-from .Locations import KOTBLocation, location_data_table, location_table, locked_locations
+from .Locations import KOTBLocation, get_location_data_table, get_location_table, get_locked_locations
 from .Options import KOTBOptions
 from .Regions import region_data_table
 from .Rules import set_victory_rule, set_location_rules
@@ -32,7 +32,7 @@ class KOTBWorld(World):
     web = KOTBWebWorld()
     options: KOTBOptions
     options_dataclass = KOTBOptions
-    location_name_to_id = location_table
+    location_name_to_id = get_location_data_table()
     item_name_to_id = item_table
     version = "0.0.1"
     minimum_compatible_client = "0.0.1"
@@ -49,6 +49,8 @@ class KOTBWorld(World):
         self.multiworld.itempool += item_pool
 
     def create_regions(self) -> None:
+        location_data_table = get_location_data_table()
+
         # Create regions.
         for region_name in region_data_table.keys():
             region = Region(region_name, self.player, self.multiworld)
@@ -62,15 +64,6 @@ class KOTBWorld(World):
                 if location_data.region == region_name and location_data.can_create(self)
             }, KOTBLocation)
             region.add_exits(region_data_table[region_name].connecting_regions)
-
-        # Place locked locations.
-        for location_name, location_data in locked_locations.items():
-            # Ignore locations we never created.
-            if not location_data.can_create(self):
-                continue
-
-            locked_item = self.create_item(location_data_table[location_name].locked_item)
-            self.get_location(location_name).place_locked_item(locked_item)
 
     def get_filler_item_name(self) -> str:
         return "Rule 00"

@@ -41,7 +41,6 @@ item_data_table: Dict[str, KOTBItemData] = {
     "Rule 05": KOTBItemData(
         code=8675314,
         type=ItemClassification.filler,
-        can_create=lambda world: False,
     ),
     "Rule 06": KOTBItemData(
         code=8675315,
@@ -134,7 +133,6 @@ item_data_table: Dict[str, KOTBItemData] = {
     "Rule 27": KOTBItemData(
         code=8675336,
         type=ItemClassification.filler,
-        can_create=lambda world: False,
     ),
     "Rule 28": KOTBItemData(
         code=8675337,
@@ -144,7 +142,6 @@ item_data_table: Dict[str, KOTBItemData] = {
         code=8675338,
         type=ItemClassification.progression,
     ),
-
     "Victory": KOTBItemData(
         type=ItemClassification.progression,
     ),

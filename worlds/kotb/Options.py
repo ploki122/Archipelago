@@ -26,8 +26,7 @@ class ButtonColor(Choice):
 
 @dataclass
 class KOTBOptions(PerGameCommonOptions):
-    color: ButtonColor
-    hard_mode: HardMode
+    shuffle_achievements: Toggle
     start_inventory_from_pool: StartInventoryPool
 
     # DeathLink is always on. Always.

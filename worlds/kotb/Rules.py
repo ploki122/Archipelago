@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 from enum import StrEnum
 from BaseClasses import CollectionState
+from ..AutoWorld import World
 from ..generic.Rules import set_rule
 
 if TYPE_CHECKING:
@@ -189,16 +190,13 @@ def set_location_rules(world: "KOTBWorld", player: int) -> None:
     set_rule(world.get_location("Break rule 00"),
              lambda state: rules.can_accuse_of_cheating(state))
     set_rule(world.get_location("Break rule 02"),
-             lambda state: state.has("Rule 02", player) and
-             (rules.can_move_pawn(state) or rules.can_move_queen(state) or rules.can_move_rook(state) or
-              rules.can_move_knight(state) or rules.can_move_king(state) or rules.can_move_bishop(state)))
+             lambda state: state.has("Rule 02", player))
     set_rule(world.get_location("Break rule 04"),
              lambda state: rules.can_move_pawn(state))
     set_rule(world.get_location("Break rule 06"),
              lambda state: rules.can_move_pawn_fully(state))
     set_rule(world.get_location("Break rule 07"),
-             lambda state: rules.can_move_knight_fully(state) or
-             (rules.can_move_knight(state) and rules.can_move_pawn(state)))
+             lambda state: rules.can_move_knight(state))
     set_rule(world.get_location("Break rule 09"),
              lambda state: state.has("Rule 09", player) and (rules.can_move_bishop(state) or rules.can_move_queen(state)
                                                              or rules.can_move_rook(state)))
@@ -225,19 +223,16 @@ def set_location_rules(world: "KOTBWorld", player: int) -> None:
              lambda state: rules.can_move_queen(state) and rules.can_capture_king(state))
 
     # Achievements
-    set_rule(world.get_location("Achievement : Title Drop"),
-             lambda state: True)
-    set_rule(world.get_location("Achievement : Forgot My Breadcrumbs"),
-             lambda state: True)
-    set_rule(world.get_location("Achievement : To infinity!"),
-             lambda state: True)
+    set_rule(world.get_location("Achievement : Title Drop"), lambda state: True)
+    set_rule(world.get_location("Achievement : Forgot My Breadcrumbs"), lambda state: True)
+    set_rule(world.get_location("Achievement : To infinity!"), lambda state: True)
 
     set_rule(world.get_location("Achievement : Doubling Profits"),
              lambda state: rules.can_castle(state))
-    set_rule(world.get_location("Achievement : Altruistic"),
-             lambda state: rules.can_capture_landmine(state))
+    set_rule(world.get_location("Achievement : Altruist"),
+             lambda state: rules.can_kill_enemies_on_mines(state))
     set_rule(world.get_location("Achievement : Slay Queen"),
-             lambda state: rules.can_capture_landmine(state) and rules.can_move_enemy_queen(state))
+             lambda state: rules.can_spawn_mines(state) and rules.can_move_enemy_queen(state))
     set_rule(world.get_location("Achievement : Philanthropist"),
              lambda state: rules.can_spawn_mines(state))
     set_rule(world.get_location("Achievement : Double Kill"),
@@ -246,14 +241,13 @@ def set_location_rules(world: "KOTBWorld", player: int) -> None:
              lambda state: rules.can_accuse_of_cheating(state) and rules.can_castle(state))
     set_rule(world.get_location("Achievement : Fooled You Twice"),
              lambda state: rules.can_ascend_pawn(state))
-    set_rule(world.get_location("Achievement : Oblivious"),
-             lambda state: rules.can_capture_pawn(state))
+    set_rule(world.get_location("Achievement : Oblivious"), lambda state: True)
     set_rule(world.get_location("Achievement : Royal Buffet"),
              lambda state: rules.can_move_rook_self_capture(state))
-    set_rule(world.get_location("Achievement : Royal Buffet"),
+    set_rule(world.get_location("Achievement : Stickler"),
              lambda state: rules.can_accuse_of_cheating(state))
-    # "85","Achievement : Stickler","Achievement"
-    # "86","Achievement : Enforcer","Achievement"
+    set_rule(world.get_location("Achievement : Enforcer"),
+             lambda state: rules.can_accuse_of_cheating(state))
 
     #  Goals
     # "Achievement : Junior Game Designer","GoalAchievement"
@@ -277,6 +271,15 @@ def set_location_rules(world: "KOTBWorld", player: int) -> None:
     # "100","Achievement : The Great Beyond","GoalAchievement"
     # "101","Achievement : Bon Voyage!","Achievement"
     # "102","Achievement : King of the Bridge","DisabledAchievement"
+
+
+def set_region_rules(world: "KOTBWorld", player: int) -> None:
+    rules: KOTBRules = KOTBRules(player)
+
+    set_rule(world.get_entrance("Pregame -> Play"),
+             lambda state: rules.can_move_pawn(state))
+    set_rule(world.get_entrance("Play -> Endgame"),
+             lambda state: rules.can_capture_everything(state))
 
 
 def set_victory_rule(world: "KOTBWorld", player: int) -> None:

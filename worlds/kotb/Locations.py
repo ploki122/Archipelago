@@ -122,11 +122,11 @@ achievementsanity_locations: Dict[str, KOTBLocationData] = {
     "Achievement : Regal Rally": KOTBLocationData("Endgame", LOCATION_OFFSET + 88),
     "Achievement : Showdown!": KOTBLocationData("Endgame", LOCATION_OFFSET + 89),
     "Achievement : Forceful Friendship": KOTBLocationData("Play", LOCATION_OFFSET + 90),
-    "Achievement : Bon Voyage!": KOTBLocationData("Play", LOCATION_OFFSET + 91),
-    "Achievement : King of the Bridge": KOTBLocationData("Disabled", LOCATION_OFFSET + 92),
+    "Achievement : King of the Bridge": KOTBLocationData("Disabled", LOCATION_OFFSET + 91),
 }
 
 achievementsanity_plus_locations: Dict[str, KOTBLocationData] = {
+    "Achievement : Bon Voyage!": KOTBLocationData("Play", LOCATION_OFFSET + 92),
     "Achievement : Junior Game Designer": KOTBLocationData("Endgame", LOCATION_OFFSET + 93),
     "Achievement : Happy Ever After": KOTBLocationData("Endgame", LOCATION_OFFSET + 94),
     "Achievement : Bookworm": KOTBLocationData("Disabled", LOCATION_OFFSET + 95),
@@ -138,3 +138,9 @@ achievementsanity_plus_locations: Dict[str, KOTBLocationData] = {
     "Achievement : Rocket Science III": KOTBLocationData("Endgame", LOCATION_OFFSET + 101),
     "Achievement : The Great Beyond": KOTBLocationData("Endgame", LOCATION_OFFSET + 102),
 }
+
+all_locations = {**achievementsanity_locations, **achievementsanity_plus_locations, **capturesanity_locations,
+                 **capture_locations, **rulesanity_locations, **kingsanity_locations}
+
+location_table = {name: data.address for name, data in all_locations.items() if data.address is not None}
+locked_locations = {name: data for name, data in all_locations.items() if data.locked_item}

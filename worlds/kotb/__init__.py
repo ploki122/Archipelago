@@ -3,10 +3,11 @@ from typing import List, Dict, Any
 from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 from .Items import KOTBItem, item_data_table, item_table
-from .Locations import KOTBLocation, get_location_data_table, get_location_table, get_locked_locations
+from .Locations import (KOTBLocation, location_table, capture_locations, kingsanity_locations, rulesanity_locations,
+                        capturesanity_locations, achievementsanity_locations, achievementsanity_plus_locations)
 from .Options import KOTBOptions
 from .Regions import region_data_table
-from .Rules import set_victory_rule, set_location_rules
+from .Rules import set_victory_rule, set_location_rules, set_region_rules
 
 
 class KOTBWebWorld(WebWorld):
@@ -32,7 +33,7 @@ class KOTBWorld(World):
     web = KOTBWebWorld()
     options: KOTBOptions
     options_dataclass = KOTBOptions
-    location_name_to_id = get_location_data_table()
+    location_name_to_id = location_table
     item_name_to_id = item_table
     version = "0.0.1"
     minimum_compatible_client = "0.0.1"
@@ -49,8 +50,6 @@ class KOTBWorld(World):
         self.multiworld.itempool += item_pool
 
     def create_regions(self) -> None:
-        location_data_table = get_location_data_table()
-
         # Create regions.
         for region_name in region_data_table.keys():
             region = Region(region_name, self.player, self.multiworld)
@@ -60,10 +59,12 @@ class KOTBWorld(World):
         for region_name, region_data in region_data_table.items():
             region = self.get_region(region_name)
             region.add_locations({
-                location_name: location_data.address for location_name, location_data in location_data_table.items()
+                location_name: location_data.address for location_name, location_data in location_table.items()
                 if location_data.region == region_name and location_data.can_create(self)
             }, KOTBLocation)
             region.add_exits(region_data_table[region_name].connecting_regions)
+
+        set_region_rules(self, self.player)
 
     def get_filler_item_name(self) -> str:
         return "Rule 00"

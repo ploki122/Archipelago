@@ -1,4 +1,7 @@
-from typing import Dict, List, NamedTuple
+from typing import NamedTuple, List, Dict
+
+from BaseClasses import Region
+from worlds.kotb import KOTBWorld
 
 
 class KOTBRegionData(NamedTuple):
@@ -6,6 +9,8 @@ class KOTBRegionData(NamedTuple):
 
 
 region_data_table: Dict[str, KOTBRegionData] = {
-    "Menu": KOTBRegionData(["Act 2"]),
-    "Act 2": KOTBRegionData(),
+    "Menu": KOTBRegionData(["Pregame"]),
+    "Pregame": KOTBRegionData(["Play"]),
+    "Play": KOTBRegionData(["Endgame"]),
+    "Endgame": KOTBRegionData(),
 }

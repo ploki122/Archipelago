@@ -3,8 +3,7 @@ from typing import List, Dict, Any
 from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 from .Items import KOTBItem, item_data_table, item_table
-from .Locations import (KOTBLocation, location_table, capture_locations, kingsanity_locations, rulesanity_locations,
-                        capturesanity_locations, achievementsanity_locations, achievementsanity_plus_locations)
+from .Locations import (KOTBLocation, location_table, all_locations)
 from .Options import KOTBOptions
 from .Regions import region_data_table
 from .Rules import set_victory_rule, set_location_rules, set_region_rules
@@ -47,6 +46,9 @@ class KOTBWorld(World):
             if item.code and item.can_create(self):
                 item_pool.append(self.create_item(name))
 
+        for _ in range(len(list(self.get_locations())) - len(item_pool)):
+            item_pool.append(self.create_item(self.get_filler_item_name()))
+
         self.multiworld.itempool += item_pool
 
     def create_regions(self) -> None:
@@ -59,7 +61,7 @@ class KOTBWorld(World):
         for region_name, region_data in region_data_table.items():
             region = self.get_region(region_name)
             region.add_locations({
-                location_name: location_data.address for location_name, location_data in location_table.items()
+                location_name: location_data.address for location_name, location_data in all_locations.items()
                 if location_data.region == region_name and location_data.can_create(self)
             }, KOTBLocation)
             region.add_exits(region_data_table[region_name].connecting_regions)

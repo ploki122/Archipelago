@@ -1,8 +1,5 @@
 from typing import NamedTuple, List, Dict
 
-from BaseClasses import Region
-from worlds.kotb import KOTBWorld
-
 
 class KOTBRegionData(NamedTuple):
     connecting_regions: List[str] = []
